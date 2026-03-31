@@ -1,593 +1,132 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>نظام دخول آمن | تشفير AES + حماية متقدمة</title>
-    
-    <!-- مكتبة AES للتشفير -->
+    <title>مولد الرموز المشفرة - 1000 رمز</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', 'Cairo', sans-serif;
-        }
-
-        /* حماية: منع تحديد النص */
         body {
-            user-select: none;
-            -webkit-user-select: none;
-            background: linear-gradient(145deg, #0a0f1c 0%, #0f172a 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-
-        /* تأثير حماية إضافي: شاشة التعتيم عند فتح الأدوات */
-        .dev-tools-warning {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.95);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            color: red;
-            font-size: 1.5rem;
-            backdrop-filter: blur(10px);
-        }
-
-        .login-card {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(12px);
-            border-radius: 2rem;
-            padding: 2rem;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.3);
-            border: 1px solid rgba(59,130,246,0.2);
-            transition: all 0.3s;
-        }
-
-        h1 {
-            text-align: center;
-            color: #f1f5f9;
-            font-weight: 800;
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .sub {
-            text-align: center;
-            color: #94a3b8;
-            margin-bottom: 2rem;
-            font-size: 0.8rem;
-        }
-
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            color: #cbd5e1;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .code-input {
-            width: 100%;
-            padding: 1rem;
-            font-size: 1.3rem;
-            font-weight: 600;
-            text-align: center;
-            letter-spacing: 3px;
             background: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 1.5rem;
-            color: #facc15;
-            outline: none;
+            color: #fff;
             font-family: monospace;
+            padding: 20px;
+            text-align: center;
         }
-
-        .code-input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.3);
-        }
-
         button {
-            width: 100%;
-            background: linear-gradient(95deg, #2563eb, #1e3a8a);
+            background: #22c55e;
+            color: #000;
             border: none;
-            padding: 0.9rem;
-            border-radius: 1.5rem;
-            font-weight: bold;
-            font-size: 1rem;
-            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(95deg, #3b82f6, #2563eb);
-        }
-
-        .message-area {
-            margin-top: 1rem;
-            padding: 0.8rem;
-            border-radius: 1rem;
-            text-align: center;
-            font-size: 0.85rem;
-            background: rgba(0,0,0,0.4);
-        }
-
-        .message-error { background: rgba(220,38,38,0.2); color: #fecaca; border-right: 3px solid #ef4444; }
-        .message-success { background: rgba(34,197,94,0.2); color: #bbf7d0; border-right: 3px solid #22c55e; }
-        .message-info { background: rgba(59,130,246,0.15); color: #bfdbfe; }
-
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1.5rem;
-            padding: 0.7rem;
-            background: rgba(0,0,0,0.3);
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            color: #94a3b8;
-        }
-
-        .stat-number {
-            color: #facc15;
+            margin: 20px;
             font-weight: bold;
-            font-size: 1rem;
         }
-
-        .footer-note {
-            font-size: 0.65rem;
-            text-align: center;
-            margin-top: 1rem;
-            color: #475569;
+        button:hover { background: #16a34a; }
+        .status {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: left;
         }
+        .success { color: #22c55e; }
+        .info { color: #3b82f6; }
     </style>
 </head>
 <body>
+    <h1>🔐 مولد الرموز المشفرة (1000 رمز)</h1>
+    <p>اضغط الزر لإنشاء 1000 رمز فريد وتشفيرها</p>
+    <button onclick="generateAndDownload()">🎲 توليد وتحميل encrypted-codes.json</button>
+    <div id="status" class="status">⏳ جاهز...</div>
 
-<!-- تحذير عند فتح أدوات المطور -->
-<div id="devWarning" class="dev-tools-warning">
-    ⚠️ تم تعطيل أدوات المطور لحماية النظام ⚠️
-    <button onclick="this.parentElement.style.display='none'" style="margin-top:20px; width:auto; padding:10px 30px;">إغلاق</button>
-</div>
-
-<div class="login-card">
-    <h1>🔐 نظام دخول آمن</h1>
-    <div class="sub">تشفير AES-256 • حماية متقدمة</div>
-
-    <div class="input-group">
-        <label>📟 أدخل الرمز السري</label>
-        <input type="text" id="accessCode" class="code-input" placeholder="AB123" maxlength="5" autocomplete="off">
-    </div>
-
-    <button id="loginBtn">🔑 تسجيل الدخول</button>
-
-    <div id="msgBox" class="message-area message-info">
-        🔒 نظام آمن بالكامل • الرموز مشفرة خارجياً
-    </div>
-
-    <div class="stats">
-        <span>📋 إجمالي الرموز</span>
-        <span><span class="stat-number" id="totalCount">0</span></span>
-        <span>🟢 متاح</span>
-        <span><span class="stat-number" id="availableCount">0</span></span>
-        <span>🔴 مستخدم</span>
-        <span><span class="stat-number" id="inUseCount">0</span></span>
-    </div>
-    <div class="footer-note">
-        🔐 جميع الرموز مخزنة بشكل مشفر • نظام جلسات موحد
-    </div>
-</div>
-
-<script>
-    // ============================================================
-    // الطبقة 1: منع أدوات المطور (متعددة الطبقات)
-    // ============================================================
-    
-    // 1. منع النقر بزر الماوس الأيمن
-    document.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        return false;
-    });
-
-    // 2. منع اختصارات فتح الأدوات
-    document.addEventListener('keydown', (e) => {
-        // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+S
-        if (e.key === 'F12' || 
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-            (e.ctrlKey && e.key === 'u') ||
-            (e.ctrlKey && e.key === 's')) {
-            e.preventDefault();
-            showDevWarning();
-            return false;
-        }
-        // Ctrl+Shift+K (Firefox)
-        if (e.ctrlKey && e.shiftKey && e.key === 'K') {
-            e.preventDefault();
-            showDevWarning();
-            return false;
-        }
-    });
-
-    // 3. كشف فتح console عبر API
-    let devtoolsOpen = false;
-    const checkDevTools = () => {
-        const threshold = 160;
-        const widthDiff = window.outerWidth - window.innerWidth > threshold;
-        const heightDiff = window.outerHeight - window.innerHeight > threshold;
-        if (widthDiff || heightDiff) {
-            if (!devtoolsOpen) {
-                devtoolsOpen = true;
-                showDevWarning();
+    <script>
+        // 🔐 المفتاح السري (يجب أن يكون مطابقاً للموجود في index.html)
+        const MASTER_SECRET = "S3cur3K3y!@#2025_AES2025";
+        const SECONDARY_SECRET = "BFT%JQH";
+        
+        // دالة XOR للتشفير الإضافي
+        function xorEncrypt(str, key) {
+            let result = '';
+            for (let i = 0; i < str.length; i++) {
+                result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
             }
-        } else {
-            devtoolsOpen = false;
+            return result;
         }
-    };
-    setInterval(checkDevTools, 1000);
-
-    // 4. منع console.log والتلاعب (تعطيل جزئي)
-    const noop = () => {};
-    if (typeof console !== 'undefined') {
-        const originalLog = console.log;
-        console.log = noop;
-        console.info = noop;
-        console.warn = noop;
-        console.debug = noop;
-        // نترك error للضرورة ولكن نعطله جزئياً
-        console.error = noop;
-    }
-
-    // 5. منع سجل الـ DOM
-    Object.freeze(document);
-    Object.freeze(navigator);
-
-    function showDevWarning() {
-        const warningDiv = document.getElementById('devWarning');
-        if (warningDiv) warningDiv.style.display = 'flex';
-        // مسح أي محاولة لقراءة البيانات
-        if (window.encryptedCodesCache) window.encryptedCodesCache = null;
-    }
-
-    // ============================================================
-    // الطبقة 2: المفتاح المشوّه والمجزأ (يصعب اكتشافه)
-    // ============================================================
-    
-    // المفتاح الأصلي: "S3cur3K3y!@#2025_AES"
-    // تم تجزئته وتشويشه في 7 أجزاء مختلفة
-    
-    const _keyPart1 = [0x53, 0x33, 0x63, 0x75, 0x72];  // "S3cur"
-    const _keyPart2 = [0x33, 0x4B, 0x33, 0x79];        // "3K3y"
-    const _keyPart3 = [0x21, 0x40, 0x23];              // "!@#"
-    const _keyPart4 = [0x32, 0x30, 0x32, 0x35];        // "2025"
-    const _keyPart5 = [0x5F, 0x41, 0x45, 0x53];        // "_AES"
-    
-    // إعادة بناء المفتاح من الأجزاء (بطريقة غير مباشرة)
-    function buildSecretKey() {
-        let key = '';
-        const allParts = [_keyPart1, _keyPart2, _keyPart3, _keyPart4, _keyPart5];
-        for (let part of allParts) {
-            for (let code of part) {
-                key += String.fromCharCode(code);
-            }
+        
+        // دالة تشفير الرمز (نفس الموجودة في نظام الدخول)
+        function encryptCode(plainCode) {
+            // الطبقة الأولى: XOR
+            const xored = xorEncrypt(plainCode, SECONDARY_SECRET);
+            // الطبقة الثانية: AES
+            return CryptoJS.AES.encrypt(xored, MASTER_SECRET).toString();
         }
-        // إضافة تشويش إضافي (معكوس جزئي)
-        const reversedPart = key.split('').reverse().join('').substring(2, 7);
-        const finalKey = key + reversedPart;
-        return finalKey.substring(0, 24); // 24 حرف للمفتاح
-    }
-    
-    // مفتاح ثانوي للتشفير الإضافي (طبقة ثانية)
-    const _secondaryKeyPart = ['A','E','S','_','M','O','D','E'];
-    function buildSecondaryKey() {
-        let skey = '';
-        for (let i = 0; i < _secondaryKeyPart.length; i++) {
-            skey += String.fromCharCode(_secondaryKeyPart[i].charCodeAt(0) + (i % 3));
-        }
-        return skey;
-    }
-    
-    const MASTER_SECRET = buildSecretKey();
-    const SECONDARY_SECRET = buildSecondaryKey();
-    
-    // ============================================================
-    // الطبقة 3: تحميل الرموز المشفرة من ملف خارجي
-    // ============================================================
-    
-    let encryptedCodesList = [];
-    let validCodesDecrypted = new Set(); // لا نخزنها بشكل دائم، فقط مؤقتاً للتحقق السريع
-    let usageMap = new Map(); // تتبع الرموز المستخدمة
-    let currentActiveCode = null;
-    
-    // عناصر DOM
-    const codeInput = document.getElementById('accessCode');
-    const loginBtn = document.getElementById('loginBtn');
-    const msgBox = document.getElementById('msgBox');
-    const totalCountSpan = document.getElementById('totalCount');
-    const availableCountSpan = document.getElementById('availableCount');
-    const inUseCountSpan = document.getElementById('inUseCount');
-    
-    // دالة فك التشفير (AES) مع طبقة تشويش إضافية
-    function decryptCode(encryptedBase64) {
-        try {
-            // الطبقة الأولى: AES
-            const decrypted = CryptoJS.AES.decrypt(encryptedBase64, MASTER_SECRET).toString(CryptoJS.enc.Utf8);
-            if (!decrypted) return null;
+        
+        // توليد 1000 رمز فريد
+        function generateUniqueCodes() {
+            const codes = [];
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             
-            // الطبقة الثانية: XOR بسيط مع المفتاح الثانوي (تشويش إضافي)
-            let finalCode = '';
-            for (let i = 0; i < decrypted.length; i++) {
-                const xorKey = SECONDARY_SECRET.charCodeAt(i % SECONDARY_SECRET.length);
-                finalCode += String.fromCharCode(decrypted.charCodeAt(i) ^ xorKey);
+            while (codes.length < 1000) {
+                const l1 = letters[Math.floor(Math.random() * letters.length)];
+                const l2 = letters[Math.floor(Math.random() * letters.length)];
+                const num = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                const code = l1 + l2 + num;
+                if (!codes.includes(code)) {
+                    codes.push(code);
+                }
             }
-            return finalCode;
-        } catch(e) {
-            return null;
+            return codes;
         }
-    }
-    
-    // تحميل القائمة المشفرة من الملف الخارجي
-    async function loadEncryptedCodes() {
-        try {
-            const response = await fetch('encrypted-codes.json');
-            if (!response.ok) throw new Error('فشل تحميل ملف الرموز');
-            const data = await response.json();
-            encryptedCodesList = data;
-            totalCountSpan.innerText = encryptedCodesList.length;
+        
+        async function generateAndDownload() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '🔄 جاري توليد 1000 رمز فريد...';
             
-            // تهيئة خريطة الاستخدام (كل الرموز حرة مبدئياً)
-            for (let i = 0; i < encryptedCodesList.length; i++) {
-                // نخزن placeholder، وسيتم فك التشفير عند الحاجة فقط
-                usageMap.set(i, false); // false = غير مستخدم
-            }
-            updateStatsUI();
-            return true;
-        } catch(e) {
-            showMessage('⚠️ خطأ في تحميل قاعدة البيانات المشفرة', 'error');
-            console.error(e);
-            return false;
-        }
-    }
-    
-    // التحقق من صحة الرمز (فك تشفير عند الحاجة فقط - بدون تخزين كل القائمة)
-    async function verifyCode(userCode) {
-        // فك تشفير تدريجي حتى نجد المطابقة (لا نخزن كل القائمة في الذاكرة)
-        for (let i = 0; i < encryptedCodesList.length; i++) {
-            const decrypted = decryptCode(encryptedCodesList[i]);
-            if (decrypted && decrypted === userCode) {
-                return { valid: true, index: i };
-            }
-        }
-        return { valid: false, index: -1 };
-    }
-    
-    // تحديث الإحصائيات
-    function updateStatsUI() {
-        let inUse = 0;
-        for (let [idx, isBusy] of usageMap.entries()) {
-            if (isBusy === true) inUse++;
-        }
-        const available = usageMap.size - inUse;
-        availableCountSpan.innerText = available;
-        inUseCountSpan.innerText = inUse;
-    }
-    
-    // حفظ حالة الاستخدام في localStorage (مزامنة بين النوافذ)
-    function persistUsageMap() {
-        const obj = {};
-        for (let [idx, isBusy] of usageMap.entries()) {
-            obj[idx] = isBusy;
-        }
-        localStorage.setItem('secure_usage_map_v3', JSON.stringify(obj));
-    }
-    
-    // تحميل حالة الاستخدام من localStorage
-    function loadUsageMap() {
-        const stored = localStorage.getItem('secure_usage_map_v3');
-        if (stored) {
-            try {
-                const obj = JSON.parse(stored);
-                for (let [idx, isBusy] of Object.entries(obj)) {
-                    if (usageMap.has(parseInt(idx))) {
-                        usageMap.set(parseInt(idx), isBusy);
-                    }
-                }
-            } catch(e) {}
-        }
-        updateStatsUI();
-    }
-    
-    // عرض رسالة
-    function showMessage(text, type = 'info') {
-        msgBox.innerHTML = text;
-        msgBox.className = 'message-area';
-        if (type === 'error') msgBox.classList.add('message-error');
-        else if (type === 'success') msgBox.classList.add('message-success');
-        else msgBox.classList.add('message-info');
-        
-        setTimeout(() => {
-            if (currentActiveCode === null && msgBox.classList.contains('message-error')) {
-                msgBox.innerHTML = '🔒 نظام آمن بالكامل • الرموز مشفرة خارجياً';
-                msgBox.className = 'message-area message-info';
-            }
-        }, 4000);
-    }
-    
-    // إضافة زر تسجيل خروج
-    function addLogoutButton() {
-        if (document.getElementById('logoutBtnSecure')) return;
-        const logoutBtn = document.createElement('button');
-        logoutBtn.id = 'logoutBtnSecure';
-        logoutBtn.textContent = '🚪 تسجيل خروج';
-        logoutBtn.style.marginTop = '10px';
-        logoutBtn.style.background = 'linear-gradient(95deg, #475569, #1e293b)';
-        logoutBtn.onclick = () => performLogout();
-        loginBtn.insertAdjacentElement('afterend', logoutBtn);
-    }
-    
-    // تسجيل خروج
-    async function performLogout() {
-        if (currentActiveCode === null) {
-            showMessage('لا توجد جلسة نشطة', 'info');
-            return;
-        }
-        
-        // تحرير الرمز
-        for (let [idx, isBusy] of usageMap.entries()) {
-            if (isBusy === true) {
-                const decrypted = decryptCode(encryptedCodesList[idx]);
-                if (decrypted === currentActiveCode) {
-                    usageMap.set(idx, false);
-                    break;
+            // توليد الرموز
+            const plainCodes = generateUniqueCodes();
+            statusDiv.innerHTML = `✅ تم توليد ${plainCodes.length} رمز فريد<br>🔄 جاري التشفير...`;
+            
+            // تشفير جميع الرموز
+            const encryptedCodes = [];
+            for (let i = 0; i < plainCodes.length; i++) {
+                encryptedCodes.push(encryptCode(plainCodes[i]));
+                if ((i + 1) % 100 === 0) {
+                    statusDiv.innerHTML = `✅ تم تشفير ${i + 1}/${plainCodes.length} رمز...`;
+                    await new Promise(r => setTimeout(r, 10));
                 }
             }
+            
+            statusDiv.innerHTML = `✨ تم تشفير جميع الرموز بنجاح!<br>📥 جاري تحميل الملف...`;
+            
+            // إنشاء ملف JSON
+            const json = JSON.stringify(encryptedCodes, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'encrypted-codes.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // عرض أول 10 رموز للتحقق
+            statusDiv.innerHTML = `
+                <span class="success">✅ تم التحميل بنجاح!</span><br>
+                📁 الملف: encrypted-codes.json<br>
+                📊 عدد الرموز: ${plainCodes.length}<br>
+                🔑 أول 3 رموز أصلية: ${plainCodes.slice(0, 3).join(', ')}<br>
+                🔒 أول 3 رموز مشفرة: ${encryptedCodes.slice(0, 3).join(', ').substring(0, 80)}...<br>
+                <span class="info">💡 انسخ ملف encrypted-codes.json إلى نفس مجلد index.html</span>
+            `;
+            
+            // طباعة في console للتحقق
+            console.log('الرموز الأصلية (أول 10):', plainCodes.slice(0, 10));
+            console.log('الرموز المشفرة (أول 3):', encryptedCodes.slice(0, 3));
         }
-        
-        persistUsageMap();
-        currentActiveCode = null;
-        localStorage.removeItem('active_secure_session');
-        updateStatsUI();
-        showMessage('🔓 تم تسجيل الخروج بنجاح', 'success');
-        
-        const logoutBtn = document.getElementById('logoutBtnSecure');
-        if (logoutBtn) logoutBtn.remove();
-        loginBtn.textContent = '🔑 تسجيل الدخول';
-        codeInput.value = '';
-    }
-    
-    // محاولة تسجيل الدخول
-    async function attemptLogin() {
-        let rawCode = codeInput.value.trim().toUpperCase();
-        
-        if (rawCode === '') {
-            showMessage('❌ الرجاء إدخال الرمز', 'error');
-            return;
-        }
-        
-        const regex = /^[A-Z]{2}[0-9]{3}$/;
-        if (!regex.test(rawCode)) {
-            showMessage('⚠️ صيغة غير صحيحة (مثال: AB123)', 'error');
-            return;
-        }
-        
-        if (currentActiveCode !== null) {
-            showMessage(`⚠️ أنت مسجل بالفعل بالرمز ${currentActiveCode}`, 'error');
-            return;
-        }
-        
-        // مزامنة آخر الحالات
-        loadUsageMap();
-        
-        // التحقق من الرمز (فك تشفير تدريجي)
-        showMessage('🔄 جاري التحقق من الرمز...', 'info');
-        const { valid, index } = await verifyCode(rawCode);
-        
-        if (!valid) {
-            showMessage(`⛔ الرمز "${rawCode}" غير معتمد! ليس ضمن قاعدة البيانات المشفرة.`, 'error');
-            return;
-        }
-        
-        // التحقق من أن الرمز غير مستخدم حالياً
-        if (usageMap.get(index) === true) {
-            showMessage(`🚫 الرمز ${rawCode} مستخدم حالياً من قبل شخص آخر`, 'error');
-            return;
-        }
-        
-        // حجز الرمز
-        usageMap.set(index, true);
-        persistUsageMap();
-        updateStatsUI();
-        
-        currentActiveCode = rawCode;
-        localStorage.setItem('active_secure_session', rawCode);
-        
-        showMessage(`✅ تم الدخول بنجاح بالرمز ${rawCode}`, 'success');
-        loginBtn.textContent = '🟢 مسجل الدخول';
-        addLogoutButton();
-    }
-    
-    // استعادة الجلسة عند إعادة تحميل الصفحة
-    async function restoreSession() {
-        const savedSession = localStorage.getItem('active_secure_session');
-        if (savedSession) {
-            const { valid, index } = await verifyCode(savedSession);
-            if (valid && usageMap.get(index) === true) {
-                currentActiveCode = savedSession;
-                showMessage(`♻️ تم استعادة جلستك: ${savedSession}`, 'success');
-                loginBtn.textContent = '🟢 مسجل الدخول';
-                addLogoutButton();
-            } else {
-                localStorage.removeItem('active_secure_session');
-            }
-        }
-        updateStatsUI();
-    }
-    
-    // الاستماع للتغييرات بين النوافذ
-    window.addEventListener('storage', (e) => {
-        if (e.key === 'secure_usage_map_v3') {
-            loadUsageMap();
-            if (currentActiveCode !== null) {
-                // التحقق من أن الرمز لا يزال محجوزاً
-                let stillActive = false;
-                for (let [idx, isBusy] of usageMap.entries()) {
-                    if (isBusy === true) {
-                        const decrypted = decryptCode(encryptedCodesList[idx]);
-                        if (decrypted === currentActiveCode) {
-                            stillActive = true;
-                            break;
-                        }
-                    }
-                }
-                if (!stillActive) {
-                    performLogout();
-                    showMessage('⚠️ تم إنهاء الجلسة من نافذة أخرى', 'error');
-                }
-            }
-        }
-    });
-    
-    // ============================================================
-    // تهيئة النظام
-    // ============================================================
-    async function init() {
-        await loadEncryptedCodes();
-        loadUsageMap();
-        await restoreSession();
-        
-        loginBtn.onclick = attemptLogin;
-        codeInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') attemptLogin();
-        });
-        
-        // حماية إضافية: مسح الحافظة بشكل دوري
-        setInterval(() => {
-            try {
-                window.clipboardData?.clearData();
-            } catch(e) {}
-        }, 3000);
-        
-        showMessage('🔐 النظام جاهز • جميع الرموز مشفرة', 'info');
-    }
-    
-    init();
-</script>
+    </script>
 </body>
 </html>
