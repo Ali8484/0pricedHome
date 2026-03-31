@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+</head>
+<body>
+    <h2>توليد 1000 رمز مشفر</h2>
+    <button onclick="generateAndDownload()">توليد وتحميل encrypted-codes.json</button>
+    <pre id="output"></pre>
+    <script>
+        function generateAndDownload() {
+            // المفتاح (نفس المستخدم في الصفحة الرئيسية)
+            const MASTER_SECRET = "S3cur3K3y!@#2025_AES2025";
+            const SECONDARY_SECRET = "BFT%JQH";
+            
+            // توليد 1000 رمز فريد
+            const codes = [];
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            
+            function xorEncrypt(str, key) {
+                let result = '';
+                for (let i = 0; i < str.length; i++) {
+                    result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+                }
+                return result;
+            }
+            
+            function encryptCode(plainCode) {
+                // الطبقة الأولى: XOR
+                const xored = xorEncrypt(plainCode, SECONDARY_SECRET);
+                // الطبقة الثانية: AES
+                return CryptoJS.AES.encrypt(xored, MASTER_SECRET).toString();
+            }
+            
+            // توليد 1000 رمز فريد
+            while (codes.length < 1000) {
+                const l1 = letters[Math.floor(Math.random() * letters.length)];
+                const l2 = letters[Math.floor(Math.random() * letters.length)];
+                const num = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                const code = l1 + l2 + num;
+                if (!codes.includes(code)) codes.push(code);
+            }
+            
+            // تشفير جميع الرموز
+            const encryptedList = codes.map(code => encryptCode(code));
+            
+            // عرض وتحميل
+            const json = JSON.stringify(encryptedList, null, 2);
+            document.getElementById('output').textContent = json;
+            
+            const blob = new Blob([json], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'encrypted-codes.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
